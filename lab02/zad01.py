@@ -1,12 +1,12 @@
-import numpy as np
-from itertools import combinations
-from copy import deepcopy
-
 from graph_representation import Graph
-from graph_visualization import visualize_circular
+from lab02.graph_visualization import visualize_circular
 
 
 def is_graphical_sequence(sequence):
+    odd_count = sum(1 for deg in sequence if deg % 2 != 0)
+    if odd_count % 2 != 0:
+        return False, "Liczba wierzchołków o nieparzystym stopniu jest nieparzysta, więc ciąg nie jest graficzny."
+
     sequence = sorted(sequence, reverse=True)
 
     while True:
@@ -33,12 +33,12 @@ def construct_graph(sequence):
     if not is_graphical:
         raise ValueError(f"Podany ciąg nie jest graficzny: {reason}")
 
-    sequence = sorted(enumerate(sequence), key=lambda x: x[1], reverse=True)  # Sortowanie par (index, stopień)
-    graph = Graph(len(sequence))  # Tworzenie pustego grafu
+    sequence = sorted(enumerate(sequence), key=lambda x: x[1], reverse=True)
+    graph = Graph(len(sequence))
 
     while any(deg > 0 for _, deg in sequence):
-        index, degree = sequence.pop(0)  # Pobranie pierwszego wierzchołka
-        sequence = sorted(sequence, key=lambda x: x[1], reverse=True)  # Ponowne sortowanie
+        index, degree = sequence.pop(0)
+        sequence = sorted(sequence, key=lambda x: x[1], reverse=True)
 
         for i in range(degree):
             if i >= len(sequence):
@@ -48,23 +48,17 @@ def construct_graph(sequence):
             graph.add_edge(index, neighbor_index)
             sequence[i] = (neighbor_index, neighbor_degree - 1)
 
-        sequence = sorted(sequence, key=lambda x: x[1], reverse=True)  # Ponowne sortowanie
+        sequence = sorted(sequence, key=lambda x: x[1], reverse=True)
 
     return graph
 
-# Przykładowe użycie:
-degree_sequences = [
-    [1,3,2,3,2,4,1],
-    [1,3,3,4,2,3,1],
-    [1,3,3,7,2,3,1],
-    [2,2,6,4,4,6,6]
-]
-
-for degree_sequence in degree_sequences:
+def zad01(degree_sequence):
     is_graphical, reason = is_graphical_sequence(degree_sequence)
     if is_graphical:
         print(f"Ciąg {degree_sequence} jest graficzny. Budowanie grafu...")
         graph = construct_graph(degree_sequence)
-        visualize_circular(graph)
+        title = "Graf sekwencji: " + str(degree_sequence)
+        visualize_circular(graph, title)
     else:
         print(f"Podany ciąg {degree_sequence} nie jest graficzny. Powód: {reason}")
+

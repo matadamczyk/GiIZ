@@ -9,7 +9,7 @@ from lab02.zad03 import is_graph_connected
 def generate_eulerian_graph(num_vertices):
     """Generuje losowy graf eulerowski poprzez tworzenie stopni parzystych."""
     while True:
-        degree_sequence = [random.randrange(2, num_vertices, 2) for _ in range(num_vertices)]  # Parzyste stopnie
+        degree_sequence = [random.randrange(2, num_vertices, 2) for _ in range(num_vertices)]
 
         if is_graphical_sequence(degree_sequence):
             graph = construct_graph(degree_sequence)
@@ -52,14 +52,13 @@ def find_eulerian_cycle(graph):
 
     return path
 
-# Przykładowe użycie:
-num_vertices = 6  # Liczba wierzchołków
-graph = generate_eulerian_graph(num_vertices)
+def zad04(num_vertices):
+    graph = generate_eulerian_graph(num_vertices)
 
-if graph:
-    visualize_circular(graph, title="Graf Eulerowski")
-    eulerian_cycle = find_eulerian_cycle(graph)
-    if eulerian_cycle:
-        print(f"Znaleziony cykl Eulera: {eulerian_cycle}")
-    else:
-        print("Nie znaleziono cyklu Eulera.")
+    if graph:
+        visualize_circular(graph, title="Graf Eulerowski")
+        eulerian_cycle = find_eulerian_cycle(graph)
+        if eulerian_cycle:
+            print(f"Znaleziony cykl Eulera: {eulerian_cycle}")
+        else:
+            print("Nie znaleziono cyklu Eulera.")

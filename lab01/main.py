@@ -54,11 +54,9 @@ def main():
     if not os.path.exists("output"):
         os.makedirs("output")
         
-    save_path = "output/graf_z_zadania.png"
-    visualize_circular(graph_from_adj, title="Graf z zadania", save_path=save_path)
+    save_path = "output/graf_z_przykladowego_wejscia.png"
+    visualize_circular(graph_from_adj, title="Graf z przykladowego wejscia", save_path=save_path)
     print(f"Wizualizacja zapisana do pliku: {save_path}")
-    
-    visualize_circular(graph_from_adj, title="Graf z zadania")
     
     print("\n3. Generowanie losowych grafów")
     print("-" * 70)

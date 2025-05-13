@@ -49,3 +49,19 @@ def zad06(vertices, edges):
         visualize_circular(graph)
     else:
         print("Graf nie zawiera cyklu Hamiltona.")
+
+
+# Zadanie 6
+# Napisać program do sprawdzania (dla małych grafów),
+# czy graf jest hamiltonowski.
+vertices = 8
+edges = [
+    (0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 0),
+    (0, 4), (1, 5), (2, 6), (3, 7)
+]
+
+zad06(vertices, edges)
+
+vertices = 6
+edges = [(0,2), (0,4), (0,5), (1,3), (1,4), (1,5), (2,4), (3,4)]
+zad06(vertices, edges)

@@ -4,7 +4,6 @@ from graph_visualization import visualize_circular
 from lab02.zad01 import construct_graph, is_graphical_sequence
 
 def dfs(v, graph, visited, component):
-    """Przechodzi przez graf DFS-em i zapisuje wierzchołki w jednej składowej spójnej."""
     visited[v] = True
     component.append(v)
     for neighbor in graph.get_adjacency_list()[v]:
@@ -12,14 +11,12 @@ def dfs(v, graph, visited, component):
             dfs(neighbor, graph, visited, component)
 
 def is_graph_connected(graph):
-    """Sprawdza, czy graf jest spójny."""
     visited = [False] * graph.V
     component = []
     dfs(0, graph, visited, component)
     return all(visited)
 
 def find_largest_connected_component(graph):
-    """Znajduje największą składową spójną w grafie."""
     visited = [False] * graph.V
     largest_component = []
 
@@ -57,3 +54,11 @@ def zad03(degree_sequence):
         visualize_circular(largest_subgraph, title="Największa składowa spójna")
     else:
         print("Podany ciąg nie jest graficzny. Nie można zbudować grafu.")
+
+
+# Zadanie 3
+# Napisać program do znajdowania największej spójnej składowej na grafie.
+# Przykładowe użycie:
+
+degree_sequence = [3, 3, 2, 2, 1, 1]
+zad03(degree_sequence)

@@ -37,3 +37,9 @@ def generate_k_regular_graph(n, k):
 def zad05(n, k):
     graph = generate_k_regular_graph(n, k)
     visualize_circular(graph, title=f"{k}-regularny graf dla {n} wierzchołków")
+
+
+# Zadanie 5
+# Napisać program do generowania losowych grafów k-regularnych.
+n, k = 8, 5  # Liczba wierzchołków i stopień k
+zad05(n,k)

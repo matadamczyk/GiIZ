@@ -62,3 +62,12 @@ def zad04(num_vertices):
             print(f"Znaleziony cykl Eulera: {eulerian_cycle}")
         else:
             print("Nie znaleziono cyklu Eulera.")
+
+
+# Zadanie 4
+# Używając powyższych programów napisać program do
+# tworzenia losowego grafu eulerowskiego i
+# znajdowania na nim cyklu Eulera.
+
+num_vertices = 6  # Liczba wierzchołków
+zad04(num_vertices)

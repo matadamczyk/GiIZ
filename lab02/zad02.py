@@ -38,3 +38,11 @@ def zad02(degree_sequence):
         visualize_circular(graph, title=f"Randomizacja")
     else:
         print(f"Podany ciąg nie jest graficzny. Powód: {reason}")
+
+# Zadanie 2
+# Napisać program do randomizacji grafów prostych o zadanych stopniach wierzchołków.
+# Do tego celu wielokrotnie powtórzyć operację zamieniającą losowo wybraną parę
+# krawędzi: ab i cd na parę ad i bc
+
+degree_sequence = [1,3,2,3,2,4,1]
+zad02(degree_sequence)

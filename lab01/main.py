@@ -66,8 +66,8 @@ def main():
     print("\n3.1. Model G(n,l) - graf losowy z zadaną liczbą wierzchołków i krawędzi")
     print("-" * 70)
     
-    n = 7  # liczba wierzchołków
-    l = 10  # liczba krawędzi
+    n = 7
+    l = 10
     
     print(f"Generowanie grafu G({n},{l}) - {n} wierzchołków, {l} krawędzi")
     g_nl = generate_gnm_random_graph(n, l)
@@ -88,8 +88,8 @@ def main():
     print("\n3.2. Model G(n,p) - graf losowy z zadaną liczbą wierzchołków i prawdopodobieństwem")
     print("-" * 70)
     
-    n = 7  # liczba wierzchołków
-    p = 0.5  # prawdopodobieństwo istnienia krawędzi
+    n = 7
+    p = 0.5
     
     print(f"Generowanie grafu G({n},{p}) - {n} wierzchołków, p={p}")
     g_np = generate_gnp_random_graph(n, p)

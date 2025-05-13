@@ -3,11 +3,11 @@ Test dla konkretnego grafu z obrazka.
 Numeracja wierzchołków w kodzie od 0 do 11 (odpowiada 1-12 z obrazka).
 """
 
-from lab03.graph_representation import Graph
-from lab03.zad2 import zad2, dijkstra, get_path
-from lab03.zad3 import compute_distance_matrix
-from lab03.zad4 import zad4, find_graph_center, find_minimax_center
-from lab03.zad5 import zad5, prim_mst, kruskal_mst
+from graph_representation import Graph
+from zad2 import zad2, dijkstra, get_path
+from zad3 import compute_distance_matrix
+from zad4 import zad4, find_graph_center, find_minimax_center
+from zad5 import zad5, prim_mst, kruskal_mst
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -275,3 +275,5 @@ def test_specific_graph():
 
 if __name__ == "__main__":
     test_specific_graph() 
+
+# python3 test_specific_graph.py

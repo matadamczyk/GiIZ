@@ -3,7 +3,7 @@ Zadanie 2: Implementacja algorytmu Dijkstry.
 """
 
 import heapq
-from lab03.zad1 import zad1
+from zad1 import zad1
 
 def init(graph, s):
     """

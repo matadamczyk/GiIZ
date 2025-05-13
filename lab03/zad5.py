@@ -2,9 +2,9 @@
 Zadanie 5: Wyznaczanie minimalnego drzewa rozpinającego.
 """
 
-from lab03.zad1 import zad1
-from lab03.graph_representation import Graph
-from lab03.graph_visualization import visualize_graph
+from zad1 import zad1
+from graph_representation import Graph
+from graph_visualization import visualize_graph
 
 def prim_mst(graph):
     """

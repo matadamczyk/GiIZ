@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import networkx as nx
 import math
-from lab03.graph_representation import Graph
+from graph_representation import Graph
 
 def visualize_circular(graph, title="Graph - Circular Layout", save_path=None, highlight_edges=None, interactive=True):
     """

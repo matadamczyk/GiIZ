@@ -1,49 +1,49 @@
 """
-Random weighted graph generator module.
-Implements generation of connected random graphs with random weights.
+Moduł generatora losowych grafów ważonych.
+Implementuje generowanie połączonych losowych grafów z losowymi wagami.
 """
 
 import random
 import math
-from lab03.graph_representation import Graph
+from graph_representation import Graph
 
 def generate_random_connected_graph(n, p=None):
     """
-    Generate a random connected graph with n vertices.
+    Generuje losowy spójny graf z n wierzchołkami.
     
-    Args:
-        n: Number of vertices
-        p: Probability of edge creation (if None, calculated automatically)
+    Argumenty:
+        n: Liczba wierzchołków
+        p: Prawdopodobieństwo utworzenia krawędzi (jeśli None, obliczane automatycznie)
         
-    Returns:
-        Graph object with n vertices that is connected
+    Zwraca:
+        Obiekt Graph z n wierzchołkami, który jest spójny
     """
     if n < 1:
-        raise ValueError("Number of vertices must be at least 1")
+        raise ValueError("Liczba wierzchołków musi wynosić co najmniej 1")
     
-    # If p is not provided, calculate a reasonable value
+    # Jeśli p nie jest podane, oblicz rozsądną wartość
     if p is None:
-        # For small n, use higher probability to ensure connectivity
+        # Dla małych n używamy wyższego prawdopodobieństwa, aby zapewnić spójność
         if n <= 10:
             p = 0.4
         else:
-            # For larger n, we can use a lower probability
-            # lim p = ln(n)/n as n → ∞ for connectivity
+            # Dla większych n możemy użyć niższego prawdopodobieństwa
+            # lim p = ln(n)/n gdy n → ∞ dla spójności
             p = max(0.1, 2 * math.log(n) / n)
     
-    # Create a graph with n vertices
+    # Utwórz graf z n wierzchołkami
     graph = Graph(n)
     
-    # First, ensure the graph is connected by adding a spanning tree
+    # Najpierw zapewnij, że graf jest spójny, dodając drzewo rozpinające
     for i in range(1, n):
-        # Connect i to a random vertex from [0, i-1]
+        # Połącz i z losowym wierzchołkiem z zakresu [0, i-1]
         j = random.randint(0, i-1)
         graph.add_edge(i, j)
     
-    # Add additional edges with probability p
+    # Dodaj dodatkowe krawędzie z prawdopodobieństwem p
     for i in range(n):
         for j in range(i + 1, n):
-            # Skip if the edge already exists
+            # Pomiń, jeśli krawędź już istnieje
             if (i, j) in graph.get_edges() or (j, i) in graph.get_edges():
                 continue
                 
@@ -54,45 +54,45 @@ def generate_random_connected_graph(n, p=None):
 
 def assign_random_weights(graph, min_weight=1, max_weight=10):
     """
-    Assign random weights to all edges in the graph.
+    Przypisuje losowe wagi do wszystkich krawędzi w grafie.
     
-    Args:
-        graph: Graph object
-        min_weight: Minimum weight (inclusive)
-        max_weight: Maximum weight (inclusive)
+    Argumenty:
+        graph: Obiekt Graph
+        min_weight: Minimalna waga (włącznie)
+        max_weight: Maksymalna waga (włącznie)
         
-    Returns:
-        The same graph with updated weights
+    Zwraca:
+        Ten sam graf z zaktualizowanymi wagami
     """
     for edge in graph.get_edges():
         u, v = edge
         weight = random.randint(min_weight, max_weight)
         
-        # Update the weight in the graph
+        # Aktualizuj wagę w grafie
         graph.weights[edge] = weight
     
     return graph
 
 def generate_random_weighted_connected_graph(n, min_weight=1, max_weight=10, p=None):
     """
-    Generate a random connected graph with n vertices and random weights.
+    Generuje losowy spójny graf z n wierzchołkami i losowymi wagami.
     
-    Args:
-        n: Number of vertices
-        min_weight: Minimum weight (inclusive)
-        max_weight: Maximum weight (inclusive)
-        p: Probability of edge creation (if None, calculated automatically)
+    Argumenty:
+        n: Liczba wierzchołków
+        min_weight: Minimalna waga (włącznie)
+        max_weight: Maksymalna waga (włącznie)
+        p: Prawdopodobieństwo utworzenia krawędzi (jeśli None, obliczane automatycznie)
         
-    Returns:
-        Graph object with n vertices, connected, with random weights
+    Zwraca:
+        Obiekt Graph z n wierzchołkami, spójny, z losowymi wagami
     """
     graph = generate_random_connected_graph(n, p)
     return assign_random_weights(graph, min_weight, max_weight)
 
 
-# Example usage
+# Przykład użycia
 if __name__ == "__main__":
     n = 10
     g = generate_random_weighted_connected_graph(n)
-    print(f"Generated a connected weighted graph with {n} vertices and {len(g.get_edges())} edges")
-    print("Weights:", g.get_weights()) 
+    print(f"Wygenerowano spójny graf ważony z {n} wierzchołkami i {len(g.get_edges())} krawędziami")
+    print("Wagi:", g.get_weights()) 

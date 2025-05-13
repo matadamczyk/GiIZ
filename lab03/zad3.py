@@ -2,8 +2,8 @@
 Zadanie 3: Wyznaczanie macierzy odległości między wszystkimi parami wierzchołków.
 """
 
-from lab03.zad1 import zad1
-from lab03.zad2 import dijkstra
+from zad1 import zad1
+from zad2 import dijkstra
 
 def compute_distance_matrix(graph):
     """

@@ -2,8 +2,8 @@
 Zadanie 1: Generowanie spójnego grafu losowego z wagami.
 """
 
-from lab03.random_weighted_graph import generate_random_weighted_connected_graph
-from lab03.graph_visualization import visualize_graph
+from random_weighted_graph import generate_random_weighted_connected_graph
+from graph_visualization import visualize_graph
 
 def zad1(n=12, min_weight=1, max_weight=10, interactive=False):
     """

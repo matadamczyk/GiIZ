@@ -2,8 +2,8 @@
 Zadanie 4: Wyznaczanie centrum grafu i centrum minimax.
 """
 
-from lab03.zad1 import zad1
-from lab03.zad3 import compute_distance_matrix
+from zad1 import zad1
+from zad3 import compute_distance_matrix
 
 def find_graph_center(distance_matrix):
     """

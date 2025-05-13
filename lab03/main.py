@@ -3,11 +3,11 @@ Główny plik do uruchomienia wszystkich zadań z laboratorium 3.
 """
 
 import argparse
-from lab03.zad1 import zad1
-from lab03.zad2 import zad2
-from lab03.zad3 import zad3
-from lab03.zad4 import zad4
-from lab03.zad5 import zad5
+from zad1 import zad1
+from zad2 import zad2
+from zad3 import zad3
+from zad4 import zad4
+from zad5 import zad5
 
 def main():
     """
@@ -64,3 +64,6 @@ def main():
 
 if __name__ == "__main__":
     main() 
+
+
+# python3 main.py --n 15 --min-weight 2 --max-weight 20 --start-vertex 3 --mst-algorithm both --interactive

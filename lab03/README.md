@@ -37,13 +37,13 @@ Aby uruchomić projekt, należy mieć zainstalowanego Pythona 3.6+ oraz bibliote
 Uruchomienie wszystkich zadań:
 
 ```
-python -m lab03.main
+python3 main.py
 ```
 
 Uruchomienie testu na konkretnym grafie:
 
 ```
-python -m lab03.test_specific_graph
+python3 test_specific_graph.py
 ```
 
 ## Opis zadań

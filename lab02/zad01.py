@@ -69,17 +69,17 @@ def zad01(degree_sequence):
 # Napisać program do sprawdzania, czy dana sekwencja liczb naturalnych
 # jest ciągiem graficznym, i do konstruowania grafu prostego o stopniach
 # wierzchołków zadanych przez ciąg graficzny
+if __name__ == "__main__":
+    # Przykładowe sekwencje liczb naturalnych
+    degree_sequences = [
+        [1,3,2,3,2,4,1],
+        [1,3,3,4,2,3,1],
+        [1,3,3,7,2,3,1],
+        [2,2,6,4,4,6,6]
+    ]
 
-# Przykładowe sekwencje liczb naturalnych
-degree_sequences = [
-    [1,3,2,3,2,4,1],
-    [1,3,3,4,2,3,1],
-    [1,3,3,7,2,3,1],
-    [2,2,6,4,4,6,6]
-]
-
-# Dla każdej sekwencji sprawdzamy czy jest ona ciągiem graficznym
-# Następnie jeżeli jest, to konstruujemy graf na tej podstawie
-# Argumentem wywołania jest ciąg graficzny
-for degree_sequence in degree_sequences:
-    zad01(degree_sequence)
+    # Dla każdej sekwencji sprawdzamy czy jest ona ciągiem graficznym
+    # Następnie jeżeli jest, to konstruujemy graf na tej podstawie
+    # Argumentem wywołania jest ciąg graficzny
+    for degree_sequence in degree_sequences:
+        zad01(degree_sequence)

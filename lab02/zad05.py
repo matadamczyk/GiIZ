@@ -41,5 +41,6 @@ def zad05(n, k):
 
 # Zadanie 5
 # Napisać program do generowania losowych grafów k-regularnych.
-n, k = 8, 5  # Liczba wierzchołków i stopień k
-zad05(n,k)
+if __name__ == "__main__":
+    n, k = 8, 5  # Liczba wierzchołków i stopień k
+    zad05(n,k)

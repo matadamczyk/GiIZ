@@ -44,5 +44,6 @@ def zad02(degree_sequence):
 # Do tego celu wielokrotnie powtórzyć operację zamieniającą losowo wybraną parę
 # krawędzi: ab i cd na parę ad i bc
 
-degree_sequence = [1,3,2,3,2,4,1]
-zad02(degree_sequence)
+if __name__ == "__main__":
+    degree_sequence = [1,3,2,3,2,4,1]
+    zad02(degree_sequence)

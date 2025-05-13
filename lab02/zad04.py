@@ -68,6 +68,6 @@ def zad04(num_vertices):
 # Używając powyższych programów napisać program do
 # tworzenia losowego grafu eulerowskiego i
 # znajdowania na nim cyklu Eulera.
-
-num_vertices = 6  # Liczba wierzchołków
-zad04(num_vertices)
+if __name__ == "__main__":
+    num_vertices = 6  # Liczba wierzchołków
+    zad04(num_vertices)

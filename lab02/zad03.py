@@ -59,6 +59,7 @@ def zad03(degree_sequence):
 # Zadanie 3
 # Napisać program do znajdowania największej spójnej składowej na grafie.
 # Przykładowe użycie:
-
-degree_sequence = [3, 3, 2, 2, 1, 1]
-zad03(degree_sequence)
+if __name__ == "__main__":
+    # Przykładowe użycie:
+    degree_sequence = [3, 3, 2, 2, 1, 1]
+    zad03(degree_sequence)

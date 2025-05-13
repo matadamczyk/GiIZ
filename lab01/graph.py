@@ -5,31 +5,24 @@ Moduł grafowy implementujący:
 3. Generowanie losowych grafów G(n,l) i G(n,p)
 """
 
+import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
-import random
-import math
 
 
 class Graph:
     def __init__(self, vertices, representation_type=None, data=None):
         self.V = vertices
-        
-        self.adjacency_matrix = [[0] * vertices for _ in range(vertices)]
-        self.incidence_matrix = []
-        self.adjacency_list = [[] for _ in range(vertices)]
-        self.edges = []
+        self.G = nx.Graph()
+        self.G.add_nodes_from(range(vertices))
         
         if representation_type and data:
             if representation_type == 'adjacency_matrix':
-                self.adjacency_matrix = data
-                self._from_adjacency_matrix()
+                self._from_adjacency_matrix(data)
             elif representation_type == 'incidence_matrix':
-                self.incidence_matrix = data
-                self._from_incidence_matrix()
+                self._from_incidence_matrix(data)
             elif representation_type == 'adjacency_list':
-                self.adjacency_list = data
-                self._from_adjacency_list()
+                self._from_adjacency_list(data)
     
     def add_edge(self, u, v):
         if u >= self.V or v >= self.V or u < 0 or v < 0:
@@ -38,97 +31,50 @@ class Graph:
         if u == v:
             raise ValueError("Pętle własne nie są dozwolone w grafach prostych")
             
-        self.adjacency_matrix[u][v] = 1
-        self.adjacency_matrix[v][u] = 1
-        
-        if v not in self.adjacency_list[u]:
-            self.adjacency_list[u].append(v)
-        if u not in self.adjacency_list[v]:
-            self.adjacency_list[v].append(u)
-        
-        edge = (min(u, v), max(u, v))
-        if edge not in self.edges:
-            self.edges.append(edge)
-            
-        self._update_incidence_matrix()
+        self.G.add_edge(u, v)
     
-    def _update_incidence_matrix(self):
-        self.incidence_matrix = [[0] * len(self.edges) for _ in range(self.V)]
-        for edge_idx, (u, v) in enumerate(self.edges):
-            self.incidence_matrix[u][edge_idx] = 1
-            self.incidence_matrix[v][edge_idx] = 1
-    
-    def _from_adjacency_matrix(self):
-        self.adjacency_list = [[] for _ in range(self.V)]
-        self.edges = []
-        
+    def _from_adjacency_matrix(self, matrix):
         for i in range(self.V):
-            for j in range(self.V):
-                if self.adjacency_matrix[i][j] == 1:
-                    self.adjacency_list[i].append(j)
-        
-        for i in range(self.V):
-            for j in range(i + 1, self.V): 
-                if self.adjacency_matrix[i][j] == 1:
-                    self.edges.append((i, j))
-        
-        self._update_incidence_matrix()
+            for j in range(i + 1, self.V):
+                if matrix[i][j] == 1:
+                    self.G.add_edge(i, j)
     
-    def _from_incidence_matrix(self):
-        self.adjacency_matrix = [[0] * self.V for _ in range(self.V)]
-        self.adjacency_list = [[] for _ in range(self.V)]
-        self.edges = []
-        
-        for edge_idx in range(len(self.incidence_matrix[0])):
-            vertices = [v for v in range(self.V) if self.incidence_matrix[v][edge_idx] == 1]
+    def _from_incidence_matrix(self, matrix):
+        for edge_idx in range(len(matrix[0])):
+            vertices = [v for v in range(self.V) if matrix[v][edge_idx] == 1]
             if len(vertices) == 2:
-                u, v = vertices
-                self.adjacency_matrix[u][v] = 1
-                self.adjacency_matrix[v][u] = 1
-                
-                if v not in self.adjacency_list[u]:
-                    self.adjacency_list[u].append(v)
-                if u not in self.adjacency_list[v]:
-                    self.adjacency_list[v].append(u)
-                  
-                self.edges.append((min(u, v), max(u, v)))
+                self.G.add_edge(vertices[0], vertices[1])
     
-    def _from_adjacency_list(self):
-        self.adjacency_matrix = [[0] * self.V for _ in range(self.V)]
-        self.edges = []
-        
+    def _from_adjacency_list(self, adj_list):
         for u in range(self.V):
-            for v in self.adjacency_list[u]:
-                self.adjacency_matrix[u][v] = 1
-                if u < v and (u, v) not in self.edges:
-                    self.edges.append((u, v))
-        
-        self._update_incidence_matrix()
+            for v in adj_list[u]:
+                if u < v:
+                    self.G.add_edge(u, v)
     
     def get_adjacency_matrix(self):
-        return self.adjacency_matrix
+        return nx.to_numpy_array(self.G).tolist()
     
     def get_incidence_matrix(self):
-        return self.incidence_matrix
+        return nx.incidence_matrix(self.G).toarray().tolist()
     
     def get_adjacency_list(self):
-        return self.adjacency_list
+        return [list(self.G.neighbors(v)) for v in range(self.V)]
     
     def get_edges(self):
-        return self.edges
+        return list(self.G.edges())
     
     def __str__(self):
-        result = f"Graf z {self.V} wierzchołkami i {len(self.edges)} krawędziami\n"
+        result = f"Graf z {self.V} wierzchołkami i {self.G.number_of_edges()} krawędziami\n"
         result += "Macierz sąsiedztwa:\n"
-        for row in self.adjacency_matrix:
+        for row in self.get_adjacency_matrix():
             result += str(row) + "\n"
         
         result += "\nMacierz incydencji:\n"
-        for row in self.incidence_matrix:
+        for row in self.get_incidence_matrix():
             result += str(row) + "\n"
         
         result += "\nLista sąsiedztwa:\n"
-        for i, neighbors in enumerate(self.adjacency_list):
+        for i, neighbors in enumerate(self.get_adjacency_list()):
             result += f"{i}: {neighbors}\n"
         
         return result
@@ -138,29 +84,9 @@ def visualize_circular(graph, title="Graf - Układ kołowy", save_path=None):
     plt.figure(figsize=(10, 10))
     plt.title(title)
     
-    num_vertices = graph.V
-    
-    radius = 5
-    angles = np.linspace(0, 2 * np.pi, num_vertices, endpoint=False)
-    
-    pos = {}
-    for i in range(num_vertices):
-        pos[i] = (radius * np.cos(angles[i]), radius * np.sin(angles[i]))
-    
-    for i in range(num_vertices):
-        plt.plot(pos[i][0], pos[i][1], 'bo', markersize=20)
-        plt.text(pos[i][0], pos[i][1], str(i+1), fontsize=12, 
-                 ha='center', va='center', color='white')
-    
-    for u, v in graph.get_edges():
-        plt.plot([pos[u][0], pos[v][0]], [pos[u][1], pos[v][1]], 'k-', linewidth=1.5)
-    
-    circle = plt.Circle((0, 0), radius, fill=False, linestyle='dotted', color='red', alpha=0.3)
-    plt.gca().add_patch(circle)
-    
-    plt.axis('equal')
-    plt.grid(False)
-    plt.axis('off')
+    pos = nx.circular_layout(graph.G)
+    nx.draw(graph.G, pos, with_labels=True, node_color='lightblue', 
+            node_size=500, font_size=12, font_weight='bold')
     
     if save_path:
         plt.savefig(save_path)
@@ -178,15 +104,9 @@ def generate_gnm_random_graph(n, m):
     if m > max_edges:
         raise ValueError(f"Za dużo krawędzi. Maksimum to {max_edges} dla {n} wierzchołków")
     
+    G = nx.gnm_random_graph(n, m)
     graph = Graph(n)
-    
-    all_edges = [(i, j) for i in range(n) for j in range(i + 1, n)]
-    
-    selected_edges = random.sample(all_edges, m)
-    
-    for u, v in selected_edges:
-        graph.add_edge(u, v)
-    
+    graph.G = G
     return graph
 
 
@@ -197,13 +117,9 @@ def generate_gnp_random_graph(n, p):
     if p < 0 or p > 1:
         raise ValueError("Prawdopodobieństwo musi być między 0 a 1")
     
+    G = nx.gnp_random_graph(n, p)
     graph = Graph(n)
-    
-    for i in range(n):
-        for j in range(i + 1, n):
-            if random.random() < p:
-                graph.add_edge(i, j)
-    
+    graph.G = G
     return graph
 
 

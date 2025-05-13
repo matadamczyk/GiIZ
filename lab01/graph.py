@@ -1,7 +1,7 @@
 """
 Moduł grafowy implementujący:
 1. Reprezentację grafów (macierz sąsiedztwa, macierz incydencji, lista sąsiedztwa)
-2. Wizualizację grafów (układ kołowy)
+2. Wizualizację grafów
 3. Generowanie losowych grafów G(n,l) i G(n,p)
 """
 
@@ -11,6 +11,7 @@ import numpy as np
 
 
 class Graph:
+    # Konstruktor przyjmujacy liczbe wierzcholkow i opcjonalnie reprezentacje grafu wraz z danymi
     def __init__(self, vertices, representation_type=None, data=None):
         self.V = vertices
         self.G = nx.Graph()
@@ -24,45 +25,62 @@ class Graph:
             elif representation_type == 'adjacency_list':
                 self._from_adjacency_list(data)
     
+    # Metoda dodajaca krawedzie do grafu
     def add_edge(self, u, v):
+        # Sprawdzenie poprawnosci indeksow wierzcholkow
         if u >= self.V or v >= self.V or u < 0 or v < 0:
             raise ValueError(f"Indeksy wierzchołków muszą być między 0 a {self.V-1}")
         
+        # Sprawdzenie istnienia petli wlasnych
         if u == v:
             raise ValueError("Pętle własne nie są dozwolone w grafach prostych")
             
         self.G.add_edge(u, v)
     
+    # Metoda konwertujaca z macierzy sasiedztwa
     def _from_adjacency_matrix(self, matrix):
+        # Przetwarzamy tylko gorny trojkat macierzy poniewaz graf jest nieskierowany
         for i in range(self.V):
             for j in range(i + 1, self.V):
+                # Dla kazdej jedynki w macierzy dodajemy odpowiednia krawedz
                 if matrix[i][j] == 1:
                     self.G.add_edge(i, j)
     
+    # Metoda konwertujaca z macierzy incydencji
     def _from_incidence_matrix(self, matrix):
+        # Dla kazdej kolumny macierzy (krawedzi) znajdujemy wierzcholki ktore ja tworza
         for edge_idx in range(len(matrix[0])):
             vertices = [v for v in range(self.V) if matrix[v][edge_idx] == 1]
+            # Sprawdzamy czy krawedz laczy dokladnie dwa wierzcholki i dodajemy ją do grafu
             if len(vertices) == 2:
                 self.G.add_edge(vertices[0], vertices[1])
     
+    # Metoda konwertujaca z listy sasiedztwa
     def _from_adjacency_list(self, adj_list):
+        # Dla kazdego wierzcholka przetwarzamy jego liste sasiadow
         for u in range(self.V):
             for v in adj_list[u]:
+                # Sprawdzamy czy nie ma duplikatow i dodajemy krawedz
                 if u < v:
                     self.G.add_edge(u, v)
     
+    # Metoda zwracajaca macierz sasiedztwa
     def get_adjacency_matrix(self):
         return nx.to_numpy_array(self.G).tolist()
     
+    # Metoda zwracajaca macierz incydencji
     def get_incidence_matrix(self):
-        return nx.incidence_matrix(self.G).toarray().tolist()
+        return nx.incidence_matrix(self.G).toarray().astype(int).tolist()
     
+    # Metoda zwracajaca liste sasiedztwa
     def get_adjacency_list(self):
         return [list(self.G.neighbors(v)) for v in range(self.V)]
     
+    # Metoda zwracajaca liste krawedzi
     def get_edges(self):
         return list(self.G.edges())
     
+    # Metoda zwracajaca reprezentacje grafu w postaci stringa
     def __str__(self):
         result = f"Graf z {self.V} wierzchołkami i {self.G.number_of_edges()} krawędziami\n"
         result += "Macierz sąsiedztwa:\n"
@@ -80,10 +98,12 @@ class Graph:
         return result
 
 
-def visualize_circular(graph, title="Graf - Układ kołowy", save_path=None):
+# Metoda wizualizujaca graf
+def visualize_circular(graph, title="Graf", save_path=None):
     plt.figure(figsize=(10, 10))
     plt.title(title)
     
+    # Ukladamy wierzcholki w okregu
     pos = nx.circular_layout(graph.G)
     nx.draw(graph.G, pos, with_labels=True, node_color='lightblue', 
             node_size=500, font_size=12, font_weight='bold')
@@ -95,21 +115,24 @@ def visualize_circular(graph, title="Graf - Układ kołowy", save_path=None):
         plt.show()
 
 
-def generate_gnm_random_graph(n, m):
+# Metoda generujaca graf losowy G(n,l) - n - liczba wierzcholkow, l - liczba krawedzi
+def generate_gnm_random_graph(n, l):
     if n < 1:
         raise ValueError("Liczba wierzchołków musi być co najmniej 1")
     
+    # Obliczamy maksymalna liczbe krawedzi
     max_edges = n * (n - 1) // 2
-    
-    if m > max_edges:
+
+    if l > max_edges:
         raise ValueError(f"Za dużo krawędzi. Maksimum to {max_edges} dla {n} wierzchołków")
     
-    G = nx.gnm_random_graph(n, m)
+    G = nx.gnm_random_graph(n, l)
     graph = Graph(n)
     graph.G = G
     return graph
 
 
+# Metoda generujaca graf losowy G(n,p) - n - liczba wierzcholkow, p - prawdopodobienstwo krawedzi
 def generate_gnp_random_graph(n, p):
     if n < 1:
         raise ValueError("Liczba wierzchołków musi być co najmniej 1")
@@ -121,65 +144,3 @@ def generate_gnp_random_graph(n, p):
     graph = Graph(n)
     graph.G = G
     return graph
-
-
-if __name__ == "__main__":
-    print("Program do reprezentacji, wizualizacji i generowania losowych grafów")
-    print("=" * 70)
-    
-    print("\n1. Reprezentacja grafów")
-    print("-" * 70)
-    
-    g = Graph(5)
-    g.add_edge(0, 1)
-    g.add_edge(0, 2)
-    g.add_edge(1, 2)
-    g.add_edge(2, 3)
-    g.add_edge(3, 4)
-    
-    print(g)
-    
-    adj_matrix = [
-        [0, 1, 1, 0, 0],
-        [1, 0, 1, 0, 0],
-        [1, 1, 0, 1, 0],
-        [0, 0, 1, 0, 1],
-        [0, 0, 0, 1, 0]
-    ]
-    g2 = Graph(5, 'adjacency_matrix', adj_matrix)
-    print("\nGraf utworzony z macierzy sąsiedztwa:")
-    print(g2)
-    
-    adj_list = [
-        [1, 2],
-        [0, 2, 3],
-        [0, 1, 3],
-        [1, 2, 4],
-        [3]
-    ]
-    g3 = Graph(5, 'adjacency_list', adj_list)
-    print("\nGraf utworzony z listy sąsiedztwa:")
-    print(g3)
-    
-    print("\n2. Wizualizacja grafów")
-    print("-" * 70)
-    
-    print("Wizualizacja grafu (okno zostanie otwarte)")
-    visualize_circular(g, title="Przykładowy Graf - Układ kołowy")
-    
-    print("\n3. Generowanie losowych grafów")
-    print("-" * 70)
-    
-    n = 7
-    m = 10
-    g_nm = generate_gnm_random_graph(n, m)
-    print(f"Wygenerowany graf G({n},{m}) ma {len(g_nm.get_edges())} krawędzi")
-    visualize_circular(g_nm, title=f"Losowy Graf G({n},{m}) - Model G(n,l)")
-    
-    n = 7
-    p = 0.5
-    g_np = generate_gnp_random_graph(n, p)
-    print(f"Wygenerowany graf G({n},{p}) ma {len(g_np.get_edges())} krawędzi")
-    visualize_circular(g_np, title=f"Losowy Graf G({n},{p}) - Model G(n,p)")
-    
-    print("\nProgram zakończony.") 

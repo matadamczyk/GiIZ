@@ -27,11 +27,11 @@ class Graph:
     
     # Metoda dodajaca krawedzie do grafu
     def add_edge(self, u, v):
-        # Sprawdzenie poprawnosci indeksow wierzcholkow
+        # Sprawdzamy poprawnosc indeksow wierzcholkow
         if u >= self.V or v >= self.V or u < 0 or v < 0:
             raise ValueError(f"Indeksy wierzchołków muszą być między 0 a {self.V-1}")
         
-        # Sprawdzenie istnienia petli wlasnych
+        # Sprawdzamy istnienie petli wlasnych
         if u == v:
             raise ValueError("Pętle własne nie są dozwolone w grafach prostych")
             

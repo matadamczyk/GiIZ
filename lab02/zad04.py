@@ -7,22 +7,24 @@ from lab02.zad03 import is_graph_connected
 
 
 def generate_eulerian_graph(num_vertices):
-    """Generuje losowy graf eulerowski poprzez tworzenie stopni parzystych."""
     while True:
+        # Losowy ciąg stopni parzystych - wymagane do grafu Eulera
         degree_sequence = [random.randrange(2, num_vertices, 2) for _ in range(num_vertices)]
 
+        # Sprawdzenie czy ciąg jest graficzny
         if is_graphical_sequence(degree_sequence):
+            # Budowanie grafu
             graph = construct_graph(degree_sequence)
+            # Sprawdzenie czy graf jest spójny
             if is_graph_connected(graph):
-                print("Ciąg jest graficzny i graf jest spójny. Budowanie grafu eulerowskiego...")
+                print("Ciąg jest graficzny i graf jest spójny. Budowanie grafu eulerowskiego.")
                 return graph
             else:
-                print("Wylosowany graf nie jest spójny, próbuję ponownie...")
+                print("Wylosowany graf nie jest spójny")
         else:
-            print("Wylosowany ciąg nie jest graficzny, próbuję ponownie...")
+            print("Wylosowany ciąg nie jest graficzny")
 
 def find_eulerian_cycle(graph):
-    """Znajduje cykl Eulera w grafie przy użyciu algorytmu Fleury'ego."""
     if not is_graph_connected(graph):
         print("Graf nie jest spójny, więc nie posiada cyklu Eulera.")
         return None
@@ -40,9 +42,10 @@ def find_eulerian_cycle(graph):
     stack = [0]
     path = []
 
+    # Algorytm Fleury'ego
     while stack:
-        u = stack[-1]
-        if graph_copy.get_adjacency_list()[u]:
+        u = stack[-1] # Wierzchołek stosu
+        if graph_copy.get_adjacency_list()[u]: # Jeśli ma nieodwiedzoną krawędź to przechodzi do niej
             v = graph_copy.get_adjacency_list()[u][0]
             graph_copy.get_adjacency_list()[u].remove(v)
             graph_copy.get_adjacency_list()[v].remove(u)

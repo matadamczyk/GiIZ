@@ -1,4 +1,5 @@
-from graph import Graph, visualize_circular, generate_gnm_random_graph, generate_gnp_random_graph
+from graph import Graph, generate_gnl_random_graph, generate_gnp_random_graph
+from graph_visualization import visualize_circular
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -68,7 +69,7 @@ def main():
     l = 10
     
     print(f"Generowanie grafu G({n},{l}) - {n} wierzchołków, {l} krawędzi")
-    g_nl = generate_gnm_random_graph(n, l)
+    g_nl = generate_gnl_random_graph(n, l)
     
     print("Wygenerowana macierz sąsiedztwa:")
     print_matrix(g_nl.get_adjacency_matrix())

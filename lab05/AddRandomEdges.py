@@ -6,9 +6,11 @@ def add_random_edges(existing_edges, node_layer_map, N):
     edge_set = set(existing_edges)
     new_edges = set()
 
+    # Dodajemy 2 * N nowych krawędzi poza podstawowymi
     while len(new_edges) < 2 * N:
         u, v = random.sample(all_nodes, 2)
 
+        # Sprawdzanie czy coś się nie powtarza
         if v == 's' or u == 'v':
             continue
         if (u, v) in edge_set or (u, v) in new_edges:

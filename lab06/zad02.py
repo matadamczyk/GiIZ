@@ -36,12 +36,13 @@ def two_opt_swap(tour, i, k):
     new_tour[i:k+1] = reversed(new_tour[i:k+1])
     return new_tour
 
-def nearest_neighbor_heuristic(points):
-    """Heurystyka najbliższego sąsiada dla lepszego rozwiązania początkowego"""
+def nearest_neighbor_heuristic(points, start=0):
+    """Heurystyka najbliższego sąsiada"""
     n = len(points)
-    unvisited = set(range(1, n))
-    tour = [0]  # Zaczynamy od punktu 0
-    current = 0
+    unvisited = set(range(n))
+    tour = [start]
+    unvisited.remove(start)
+    current = start
     
     while unvisited:
         nearest = min(unvisited, key=lambda x: distance(points[current], points[x]))
@@ -51,16 +52,46 @@ def nearest_neighbor_heuristic(points):
     
     return tour
 
-def simulated_annealing(points, T_start=1000.0, T_end=1e-6, alpha=0.99, max_iter=100000):
+def random_tour_generator(points):
+    """Generuje losową trasę"""
+    tour = list(range(len(points)))
+    random.shuffle(tour)
+    return tour
+
+def get_best_initial_solution(points, num_trials=10):
+    """Znajdź najlepsze rozwiązanie początkowe spośród kilku prób"""
+    best_tour = None
+    best_distance = float('inf')
+    
+    # Próbuj różne punkty startowe dla nearest neighbor
+    for start in range(min(num_trials, len(points))):
+        tour = nearest_neighbor_heuristic(points, start)
+        dist = total_distance(tour, points)
+        if dist < best_distance:
+            best_distance = dist
+            best_tour = tour
+    
+    # Próbuj też kilka losowych rozwiązań
+    for _ in range(num_trials):
+        tour = random_tour_generator(points)
+        dist = total_distance(tour, points)
+        if dist < best_distance:
+            best_distance = dist
+            best_tour = tour
+    
+    return best_tour, best_distance
+
+def simulated_annealing_advanced(points, T_start=10000.0, T_end=1e-10, 
+                                cooling_schedule='exponential', max_iter=500000):
     """
-    Algorytm symulowanego wyżarzania dla TSP
-    Używa operacji 2-opt zgodnie z algorytmem Metropolisa-Hastingsa
+    Zaawansowany algorytm symulowanego wyżarzania z różnymi strategiami chłodzenia
     """
     n = len(points)
     
-    # Lepsze rozwiązanie początkowe - heurystyka najbliższego sąsiada
-    current = nearest_neighbor_heuristic(points)
-    current_dist = total_distance(current, points)
+    # Znajdź najlepsze rozwiązanie początkowe
+    print("Szukanie najlepszego rozwiązania początkowego...")
+    current, current_dist = get_best_initial_solution(points, num_trials=20)
+    print(f"Najlepsze rozwiązanie początkowe: {current_dist:.3f}")
     
     best = current[:]
     best_dist = current_dist
@@ -68,21 +99,36 @@ def simulated_annealing(points, T_start=1000.0, T_end=1e-6, alpha=0.99, max_iter
     
     accepted_moves = 0
     total_moves = 0
+    improvements = 0
+    
+    # Historia dla analizy
+    temperature_history = []
+    distance_history = []
     
     for iteration in range(max_iter):
         if T < T_end:
             break
-            
-        # Losowy wybór dwóch pozycji dla operacji 2-opt
+        
+        # Wybór dwóch różnych pozycji dla operacji 2-opt
         i = random.randint(0, n - 1)
         k = random.randint(0, n - 1)
         
-        # Upewniamy się, że i < k i że są odpowiednio oddalone
+        # Upewnij się, że i < k i że są odpowiednio oddalone
         if i > k:
             i, k = k, i
+        
+        # Sprawdź czy pozycje są odpowiednio oddalone
         if k - i < 2:
             continue
             
+        # Czasami wybierz punkty daleko od siebie dla większej eksploracji
+        if random.random() < 0.3 and iteration < max_iter // 2:
+            # W pierwszej połowie algorytmu preferuj większe zmiany
+            min_distance = max(2, n // 10)
+            max_distance = min(n // 2, n - 1)
+            if k - i < min_distance:
+                k = min(i + random.randint(min_distance, max_distance), n - 1)
+        
         # Wykonanie operacji 2-opt
         new_tour = two_opt_swap(current, i, k)
         new_dist = total_distance(new_tour, points)
@@ -91,7 +137,16 @@ def simulated_annealing(points, T_start=1000.0, T_end=1e-6, alpha=0.99, max_iter
         total_moves += 1
         
         # Kryterium akceptacji Metropolisa
-        if delta < 0 or (T > 0 and random.random() < math.exp(-delta / T)):
+        accept = False
+        if delta < 0:
+            accept = True
+            improvements += 1
+        elif T > 0:
+            probability = math.exp(-delta / T)
+            if random.random() < probability:
+                accept = True
+        
+        if accept:
             current = new_tour
             current_dist = new_dist
             accepted_moves += 1
@@ -101,117 +156,136 @@ def simulated_annealing(points, T_start=1000.0, T_end=1e-6, alpha=0.99, max_iter
                 best = current[:]
                 best_dist = current_dist
         
-        # Schładzanie
-        T *= alpha
+        # Strategia chłodzenia
+        if cooling_schedule == 'exponential':
+            alpha = 0.99995  # Bardzo wolne chłodzenie
+            T *= alpha
+        elif cooling_schedule == 'linear':
+            T = T_start * (1 - iteration / max_iter)
+        elif cooling_schedule == 'logarithmic':
+            T = T_start / math.log(iteration + 2)
         
-        # Informacja o postępie co 10000 iteracji
-        if iteration % 10000 == 0:
+        # Zapisz historię
+        if iteration % 1000 == 0:
+            temperature_history.append(T)
+            distance_history.append(best_dist)
+        
+        # Informacja o postępie
+        if iteration % 50000 == 0:
             acceptance_rate = accepted_moves / max(total_moves, 1) * 100
-            print(f"Iteracja {iteration}: T={T:.6f}, Najlepsza długość={best_dist:.3f}, "
-                  f"Akceptacja={acceptance_rate:.1f}%")
+            improvement_rate = improvements / max(total_moves, 1) * 100
+            print(f"Iteracja {iteration}: T={T:.8f}, Najlepsza={best_dist:.3f}, "
+                  f"Akceptacja={acceptance_rate:.1f}%, Poprawa={improvement_rate:.1f}%")
     
     print(f"Zakończono po {iteration + 1} iteracjach")
-    print(f"Końcowa temperatura: {T:.6f}")
+    print(f"Końcowa temperatura: {T:.10f}")
     print(f"Całkowita liczba ruchów: {total_moves}")
     print(f"Zaakceptowane ruchy: {accepted_moves}")
+    print(f"Poprawy: {improvements}")
     
-    return best, best_dist
+    return best, best_dist, temperature_history, distance_history
 
-def plot_tour(points, tour, title="Cykl Hamiltona"):
-    """Wizualizacja znalezionego cyklu"""
-    if not points or not tour:
-        print("Brak danych do wyświetlenia")
-        return
+def multiple_runs_sa(points, num_runs=3):
+    """Uruchom algorytm kilka razy i wybierz najlepszy wynik"""
+    best_overall = None
+    best_distance_overall = float('inf')
+    all_results = []
+    
+    print(f"\n=== Uruchamianie {num_runs} niezależnych prób ===")
+    
+    for run in range(num_runs):
+        print(f"\nPróba {run + 1}/{num_runs}")
+        # Różne ziarna dla każdej próby
+        random.seed(42 + run * 100)
+        np.random.seed(42 + run * 100)
         
-    x_coords = [points[i][0] for i in tour] + [points[tour[0]][0]]
-    y_coords = [points[i][1] for i in tour] + [points[tour[0]][1]]
+        # Różne parametry dla różnorodności
+        T_start = random.uniform(8000, 12000)
+        max_iter = random.randint(400000, 600000)
+        
+        tour, distance, temp_hist, dist_hist = simulated_annealing_advanced(
+            points, 
+            T_start=T_start,
+            max_iter=max_iter
+        )
+        
+        all_results.append((tour, distance))
+        print(f"Wynik próby {run + 1}: {distance:.3f}")
+        
+        if distance < best_distance_overall:
+            best_distance_overall = distance
+            best_overall = tour
     
-    plt.figure(figsize=(12, 8))
-    plt.plot(x_coords, y_coords, 'o-', color='red', markersize=4, linewidth=1)
-    plt.scatter([points[i][0] for i in range(len(points))], 
-                [points[i][1] for i in range(len(points))], 
-                c='blue', s=20, zorder=5)
+    print(f"\nNajlepszy wynik ze wszystkich prób: {best_distance_overall:.3f}")
+    return best_overall, best_distance_overall, all_results
+
+def plot_comparison(points, initial_tour, best_tour):
+    """Porównanie cyklu początkowego i wyjściowego"""
     
-    plt.title(f"{title}\nDługość cyklu: {total_distance(tour, points):.3f}")
-    plt.xlabel("x")
-    plt.ylabel("y")
-    plt.grid(True, alpha=0.3)
-    plt.axis('equal')
+    # Oblicz długości tras
+    initial_dist = total_distance(initial_tour, points)
+    best_dist = total_distance(best_tour, points)
+    
+    # Utwórz subplot z 2 wykresami
+    fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+    
+    tours_data = [
+        (initial_tour, initial_dist, "Cykl początkowy", "red"), 
+        (best_tour, best_dist, "Cykl wyjściowy", "red")
+    ]
+    
+    for i, (tour, distance, title, color) in enumerate(tours_data):
+        # Współrzędne trasy
+        x_coords = [points[j][0] for j in tour] + [points[tour[0]][0]]
+        y_coords = [points[j][1] for j in tour] + [points[tour[0]][1]]
+        
+        # Rysowanie trasy
+        axes[i].plot(x_coords, y_coords, 'o-', color=color, markersize=3, linewidth=1.5, alpha=0.8)
+        
+        # Rysowanie wszystkich punktów
+        axes[i].scatter([points[j][0] for j in range(len(points))], 
+                       [points[j][1] for j in range(len(points))], 
+                       c='red', s=15, zorder=5, alpha=0.7)
+        
+        axes[i].set_title(f"({chr(97+i)}) {title}. Długość cyklu: {distance:.3f}")
+        axes[i].set_xlabel("x")
+        axes[i].set_ylabel("y")
+        axes[i].grid(True, alpha=0.3)
+        axes[i].set_aspect('equal')
+    
     plt.tight_layout()
     plt.show()
 
-def compare_initial_solutions(points):
-    """Porównanie różnych rozwiązań początkowych"""
-    print("\n=== Porównanie rozwiązań początkowych ===")
-    
-    # Rozwiązanie losowe
-    random_tour = list(range(len(points)))
-    random.shuffle(random_tour)
-    random_dist = total_distance(random_tour, points)
-    print(f"Rozwiązanie losowe: {random_dist:.3f}")
-    
-    # Heurystyka najbliższego sąsiada
-    nn_tour = nearest_neighbor_heuristic(points)
-    nn_dist = total_distance(nn_tour, points)
-    print(f"Najbliższy sąsiad: {nn_dist:.3f}")
-    
-    return random_tour, nn_tour
 
 # Główny program
 if __name__ == "__main__":
-    # Ustawienie ziarna dla powtarzalności
-    random.seed(42)
-    np.random.seed(42)
-    
     # Wczytanie danych
-    filename = "xqf131.dat"  # Zgodnie z poleceniem
+    filename = "xqf131.dat"
     points = load_points(filename)
     
     if not points:
-        print("Nie udało się wczytać danych. Sprawdź czy plik xqf131.dat istnieje.")
+        print("Nie udało się wczytać danych.")
         exit(1)
     
     print(f"Wczytano {len(points)} punktów z pliku {filename}")
     
-    # Porównanie rozwiązań początkowych
-    random_tour, nn_tour = compare_initial_solutions(points)
+    # Cykl początkowy - losowy (jak na obrazku a)
+    random.seed(42)
+    initial_tour = random_tour_generator(points)
+    initial_distance = total_distance(initial_tour, points)
+    print(f"Cykl początkowy (losowy): {initial_distance:.3f}")
     
-    print("\n=== Symulowane wyżarzanie ===")
+    # Pojedyncze uruchomienie symulowanego wyżarzania
+    print("\n=== Uruchamianie symulowanego wyżarzania ===")
+    best_tour, best_distance, temp_hist, dist_hist = simulated_annealing_advanced(points)
     
-    # Algorytm symulowanego wyżarzania z lepszymi parametrami
-    best_tour, best_distance = simulated_annealing(
-        points, 
-        T_start=1000.0,    # Wyższa temperatura początkowa
-        T_end=1e-8,        # Niższa temperatura końcowa
-        alpha=0.9995,      # Wolniejsze chłodzenie
-        max_iter=200000    # Więcej iteracji
-    )
+    print(f"\n=== KOŃCOWE WYNIKI ===")
+    print(f"Cykl początkowy: {initial_distance:.3f}")
+    print(f"Cykl wyjściowy: {best_distance:.3f}")
+    print(f"Poprawa: {initial_distance - best_distance:.3f}")
+    print(f"Oczekiwany wynik (z obrazka): 567.203")
+    print(f"Różnica od oczekiwanego: {abs(best_distance - 567.203):.3f}")
     
-    print(f"\n=== WYNIKI ===")
-    print(f"Najkrótsza znaleziona droga: {best_distance:.3f}")
-    print(f"Kolejność odwiedzin: {best_tour}")
-    
-    # Wizualizacja wyników
-    plot_tour(points, best_tour, "Najlepszy cykl znaleziony przez symulowane wyżarzanie")
-    
-    # Dodatkowa wizualizacja porównawcza
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
-    
-    # Cykl początkowy (najbliższy sąsiad)
-    x1 = [points[i][0] for i in nn_tour] + [points[nn_tour[0]][0]]
-    y1 = [points[i][1] for i in nn_tour] + [points[nn_tour[0]][1]]
-    ax1.plot(x1, y1, 'o-', color='blue', markersize=3, linewidth=1)
-    ax1.set_title(f"Cykl początkowy\nDługość: {total_distance(nn_tour, points):.3f}")
-    ax1.grid(True, alpha=0.3)
-    ax1.set_aspect('equal')
-    
-    # Najlepszy cykl
-    x2 = [points[i][0] for i in best_tour] + [points[best_tour[0]][0]]
-    y2 = [points[i][1] for i in best_tour] + [points[best_tour[0]][1]]
-    ax2.plot(x2, y2, 'o-', color='red', markersize=3, linewidth=1)
-    ax2.set_title(f"Cykl wyjściowy\nDługość: {best_distance:.3f}")
-    ax2.grid(True, alpha=0.3)
-    ax2.set_aspect('equal')
-    
-    plt.tight_layout()
-    plt.show()
+    # Wizualizacja porównania
+    print("\nGenerowanie wizualizacji...")
+    plot_comparison(points, initial_tour, best_tour)

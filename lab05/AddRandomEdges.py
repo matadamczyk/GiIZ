@@ -9,16 +9,17 @@ def add_random_edges(existing_edges, node_layer_map, N):
     while len(new_edges) < 2 * N:
         u, v = random.sample(all_nodes, 2)
 
-        # Zakazane: łuk do źródła lub z ujścia
+        # krawędź do źródła lub z ujścia
         if node_layer_map[v] == 0 or node_layer_map[u] == N + 1:
             continue
 
-        # Zakazane: łuk już istnieje w dowolnym kierunku
+        # krawędź już istnieje w dowolnym kierunku
         if (u, v) in edge_set or (v, u) in edge_set or (u, v) in new_edges or (v, u) in new_edges:
             continue
 
         if v == 's' or u == 'v':
             continue
+
         if (u, v) in edge_set or (u, v) in new_edges:
             continue
 

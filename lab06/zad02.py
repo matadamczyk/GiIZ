@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 def load_points(filename):
     """
     KROK 1: Wczytywanie punktów z pliku
-    Format: każda linia zawiera x y (współrzędne punktu)
     """
     print(f"=== WCZYTYWANIE DANYCH Z PLIKU {filename} ===")
     points = []
@@ -17,7 +16,7 @@ def load_points(filename):
                 if line:
                     x, y = map(float, line.split())
                     points.append((x, y))
-                    if line_num <= 5:  # Pokazujemy pierwsze 5 punktów
+                    if line_num <= 5:
                         print(f"  Punkt {line_num}: ({x:.2f}, {y:.2f})")
         print(f"Wczytano {len(points)} punktów")
     except FileNotFoundError:
@@ -51,12 +50,6 @@ def total_distance(tour, points):
 def two_opt_swap(tour, i, k):
     """
     OPERACJA 2-OPT: Odwrócenie fragmentu trasy między pozycjami i a k
-    
-    Przykład:
-    Przed: [A, B, C, D, E, F] gdzie i=1, k=4
-    Po:    [A, E, D, C, B, F] (odwróciliśmy fragment B,C,D,E)
-    
-    To jest podstawowa operacja w algorytmie Metropolis-Hastings dla TSP
     """
     new_tour = tour[:]  # Kopia oryginalnej trasy
     new_tour[i:k+1] = reversed(new_tour[i:k+1])  # Odwracamy fragment
@@ -72,8 +65,8 @@ def nearest_neighbor_heuristic(points, start=0):
     3. Kontynuuj aż odwiedzisz wszystkie punkty
     """
     n = len(points)
-    unvisited = set(range(n))  # Zbiór nieodwiedzonych punktów
-    tour = [start]  # Trasa zaczynająca się od punktu start
+    unvisited = set(range(n))
+    tour = [start]
     unvisited.remove(start)
     current = start
     
@@ -90,8 +83,8 @@ def random_tour_generator(points):
     """
     GENERATOR LOSOWEJ TRASY - dla różnorodności rozwiązań początkowych
     """
-    tour = list(range(len(points)))  # [0, 1, 2, ..., n-1]
-    random.shuffle(tour)  # Losowe przetasowanie
+    tour = list(range(len(points)))
+    random.shuffle(tour)
     return tour
 
 def get_best_initial_solution(points, num_trials=10):
@@ -118,7 +111,7 @@ def get_best_initial_solution(points, num_trials=10):
     for trial in range(num_trials):
         tour = random_tour_generator(points)
         dist = total_distance(tour, points)
-        if trial < 3:  # Pokazujemy pierwsze 3
+        if trial < 3:
             print(f"  Losowa trasa {trial + 1}: długość = {dist:.3f}")
         if dist < best_distance:
             best_distance = dist
@@ -130,14 +123,14 @@ def get_best_initial_solution(points, num_trials=10):
 def simulated_annealing_advanced(points, T_start=10000.0, T_end=1e-10, 
                                 cooling_schedule='exponential', max_iter=500000):
     """
-    ALGORYTM SYMULOWANEGO WYŻARZANIA (SIMULATED ANNEALING)
+    ALGORYTM SYMULOWANEGO WYŻARZANIA
     
     PARAMETRY:
     - T_start: temperatura początkowa (wysoka = akceptujemy złe ruchy)
     - T_end: temperatura końcowa (niska = akceptujemy tylko dobre ruchy)
     - max_iter: maksymalna liczba iteracji
     
-    ALGORYTM METROPOLIS-HASTINGS:
+    ALGORYTM:
     1. Zacznij od rozwiązania początkowego
     2. W każdej iteracji:
        a) Wykonaj operację 2-opt (zmień trasę)
@@ -234,12 +227,12 @@ def simulated_annealing_advanced(points, T_start=10000.0, T_end=1e-10,
         elif cooling_schedule == 'logarithmic':
             T = T_start / math.log(iteration + 2)
         
-        # ZAPISUJEMY HISTORIĘ (co 1000 iteracji)
+        # ZAPISUJEMY HISTORIĘ
         if iteration % 1000 == 0:
             temperature_history.append(T)
             distance_history.append(best_dist)
         
-        # RAPORT POSTĘPU (co 50000 iteracji)
+        # RAPORT POSTĘPU)
         if iteration % 50000 == 0:
             acceptance_rate = accepted_moves / max(total_moves, 1) * 100
             improvement_rate = improvements / max(total_moves, 1) * 100
@@ -282,7 +275,7 @@ def plot_comparison(points, initial_tour, best_tour):
     for i, (tour, distance, title, color) in enumerate(tours_data):
         print(f"  Rysowanie wykresu {i+1}: {title}")
         
-        # Współrzędne trasy (dodajemy pierwszy punkt na końcu dla zamknięcia cyklu)
+        # Współrzędne trasy
         x_coords = [points[j][0] for j in tour] + [points[tour[0]][0]]
         y_coords = [points[j][1] for j in tour] + [points[tour[0]][1]]
         
@@ -341,8 +334,6 @@ if __name__ == "__main__":
     print(f"Cykl wyjściowy:      {best_distance:.3f}")
     print(f"Poprawa:             {initial_distance - best_distance:.3f}")
     print(f"Poprawa (%):         {(initial_distance - best_distance)/initial_distance*100:.1f}%")
-    print(f"Oczekiwany wynik:    567.203 (z dokumentacji)")
-    print(f"Różnica od optymalnego: {abs(best_distance - 567.203):.3f}")
     
     # KROK 5: Wizualizacja
     print(f"\n=== GENEROWANIE WIZUALIZACJI ===")

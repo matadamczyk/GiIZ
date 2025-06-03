@@ -26,7 +26,6 @@ def pagerank_random_walk(graph, nodes, d=0.15, steps=1_000_000):
        - Z prawdopodobieństwem d: teleportujemy się losowo (restart)
        - Z prawdopodobieństwem (1-d): idziemy do losowego sąsiada
     3. Zliczamy odwiedziny każdego węzła
-    4. PageRank = częstość odwiedzin
     """
     print("=== ROZPOCZYNAMY BŁĄDZENIE PRZYPADKOWE ===")
     visits = defaultdict(int)  # Licznik odwiedzin każdego węzła
@@ -83,14 +82,12 @@ def pagerank_power_iteration(graph, nodes, d=0.15, max_iter=100, tolerance=1e-6)
                 i = index[neighbor]  # Wiersz (węzeł docelowy)
                 A[i, j] = 1 / len(neighbors)  # Równomierne prawdopodobieństwo
         else:
-            # Węzeł nie ma wychodzących krawędzi - "teleportacja" do wszystkich
+            # Węzeł nie ma wychodzących krawędzi - teleportacja do wszystkich
             print(f"  Węzeł {node} -> brak sąsiadów, równomierne rozłożenie")
             for i in range(n):
                 A[i, j] = 1 / n
     
     print("KROK 2: Obliczanie macierzy PageRank P = (1-d)*A + (d/n)*J")
-    # MACIERZ PAGERANK: P = (1-d)*A + (d/n)*J
-    # J = macierz jedynek (reprezentuje teleportację)
     P = (1 - d) * A + d / n * np.ones((n, n))
     
     print("KROK 3: Iteracje wektora obsadzeń")

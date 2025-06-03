@@ -1,11 +1,12 @@
 """
-Wizualizacja grafów skierowanych (digrafów).
+Moduł do wizualizacji digrafów i algorytmów grafowych.
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-from lab04.digraph_representation import DiGraph
+import networkx as nx
+from digraph_representation import DiGraph
 
 def visualize_digraph(digraph, title="Graf skierowany", layout="circular", highlight_edges=None, 
                      save_path=None, node_labels=None, edge_labels=True, interactive=False,

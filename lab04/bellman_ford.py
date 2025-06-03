@@ -1,9 +1,8 @@
 """
-Implementacja algorytmu Bellmana-Forda do znajdowania najkrótszych ścieżek w grafie skierowanym.
-Ten algorytm może obsługiwać krawędzie o ujemnych wagach i wykrywać cykle o ujemnej sumie wag.
+Algorytm Bellmana-Forda do znajdowania najkrótszych ścieżek w digrafie z wagami.
 """
 
-from lab04.digraph_representation import DiGraph
+from digraph_representation import DiGraph
 
 def init(digraph, s):
     """

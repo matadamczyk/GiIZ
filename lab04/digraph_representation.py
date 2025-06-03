@@ -73,6 +73,14 @@ class DiGraph:
         edge = (u, v)
         return self.weights.get(edge)
     
+    def set_edge_weight(self, u, v, weight):
+        """Ustawia wagę krawędzi od u do v."""
+        edge = (u, v)
+        if edge in self.weights:
+            self.weights[edge] = weight
+        else:
+            raise ValueError(f"Krawędź ({u}, {v}) nie istnieje")
+    
     def transpose(self):
         """
         Tworzy graf transponowany (odwrócenie kierunku wszystkich krawędzi).

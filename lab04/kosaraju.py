@@ -1,8 +1,8 @@
 """
-Implementacja algorytmu Kosaraju do znajdowania silnie spójnych składowych w grafie skierowanym.
+Algorytm Kosaraju do znajdowania silnie spójnych składowych w digrafie.
 """
 
-from lab04.digraph_representation import DiGraph
+from digraph_representation import DiGraph
 
 def kosaraju(digraph):
     """

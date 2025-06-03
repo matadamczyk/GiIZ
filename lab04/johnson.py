@@ -3,8 +3,9 @@ Implementacja algorytmu Johnsona do znajdowania najkrótszych ścieżek między 
 Algorytm może obsługiwać krawędzie o ujemnych wagach, o ile w grafie nie ma cyklu o ujemnej sumie wag.
 """
 
-from lab04.digraph_representation import DiGraph
-from lab04.bellman_ford import bellman_ford, init, relax
+import math
+from digraph_representation import DiGraph
+from bellman_ford import bellman_ford, init, relax
 import heapq
 
 def add_s(digraph):

@@ -1,102 +1,90 @@
-# Laboratorium 4: Grafy Skierowane i Algorytmy
+# Laboratorium 4 - Grafy skierowane i algorytmy grafowe
 
-Pakiet zawiera implementacje i wizualizacje algorytmów dla grafów skierowanych (digrafów), takich jak algorytm Kosaraju do znajdowania silnie spójnych składowych, algorytm Bellmana-Forda do znajdowania najkrótszych ścieżek w grafie z ujemnymi wagami oraz algorytm Johnsona do znajdowania najkrótszych ścieżek między wszystkimi parami wierzchołków.
+Ten projekt implementuje podstawowe algorytmy dla grafów skierowanych (digrafów).
 
-## Spis treści
+## Zaimplementowane algorytmy
 
-1. [Struktura projektu](#struktura-projektu)
-2. [Instalacja i uruchomienie](#instalacja-i-uruchomienie)
-3. [Opis zadań](#opis-zadań)
-4. [Przykład użycia](#przykład-użycia)
+1. **Generowanie losowego digrafu** - z zespołu G(n, p)
+2. **Algorytm Kosaraju** - znajdowanie silnie spójnych składowych
+3. **Algorytm Bellmana-Forda** - najkrótsze ścieżki z obsługą ujemnych wag
+4. **Algorytm Johnsona** - najkrótsze ścieżki między wszystkimi parami wierzchołków
 
-## Struktura projektu
+## Struktura plików
 
-```
-lab04/
-├── __init__.py                    # Deklaracja pakietu
-├── digraph_representation.py      # Klasa DiGraph - reprezentacja grafu skierowanego
-├── digraph_visualization.py       # Funkcje do wizualizacji grafów skierowanych
-├── random_digraph.py              # Generator losowych digrafów
-├── kosaraju.py                    # Implementacja algorytmu Kosaraju
-├── bellman_ford.py                # Implementacja algorytmu Bellmana-Forda
-├── johnson.py                     # Implementacja algorytmu Johnsona
-├── zad1.py                        # Zadanie 1: Generowanie losowego digrafu
-├── zad2.py                        # Zadanie 2: Znajdowanie silnie spójnych składowych
-├── zad3.py                        # Zadanie 3: Algorytm Bellmana-Forda
-├── zad4.py                        # Zadanie 4: Algorytm Johnsona
-├── test_specific_graph.py         # Testy na konkretnym grafie z przykładu
-└── main.py                        # Główny plik uruchamiający wszystkie zadania
-```
+- `digraph_representation.py` - Klasa DiGraph z różnymi reprezentacjami
+- `random_digraph.py` - Generatory losowych digrafów
+- `kosaraju.py` - Algorytm Kosaraju
+- `bellman_ford.py` - Algorytm Bellmana-Forda
+- `johnson.py` - Algorytm Johnsona
+- `digraph_visualization.py` - Wizualizacja digrafów
+- `zad1.py` - Zadanie 1: Generator losowych digrafów
+- `zad2.py` - Zadanie 2: Silnie spójne składowe
+- `zad3.py` - Zadanie 3: Digraf z wagami + Bellman-Ford
+- `zad4.py` - Zadanie 4: Algorytm Johnsona
+- `main.py` - Główny plik uruchamiający wszystkie zadania
 
-## Instalacja i uruchomienie
+## Uruchomienie
 
-Aby uruchomić projekt, należy mieć zainstalowanego Pythona 3.6+ oraz biblioteki:
+### Pojedyncze zadania
 
-- matplotlib
-- numpy
-
-Uruchomienie wszystkich zadań:
-
-```
-python -m lab04.main --interactive
+```bash
+cd lab04
+python3 zad1.py    # Zadanie 1
+python3 zad2.py    # Zadanie 2
+python3 zad3.py    # Zadanie 3
+python3 zad4.py    # Zadanie 4
 ```
 
-Uruchomienie testu dla konkretnego grafu z przykładu:
+### Wszystkie zadania naraz
 
-```
-python -m lab04.main --test-specific
-```
-
-Uruchomienie wybranych zadań:
-
-```
-python -m lab04.main --tasks 1,3 --n 10 --p 0.5
+```bash
+cd lab04
+python3 main.py    # Uruchom wszystkie zadania
 ```
 
-## Opis zadań
+## Funkcjonalności
 
-### Zadanie 1: Generowanie losowego digrafu
+### Klasa DiGraph
 
-Implementacja generatora losowych grafów skierowanych z zespołu G(n, p), gdzie n to liczba wierzchołków, a p to prawdopodobieństwo istnienia krawędzi między dowolną parą wierzchołków.
+- Obsługa trzech reprezentacji: macierz sąsiedztwa, lista sąsiedztwa, macierz incydencji
+- Automatyczna synchronizacja między reprezentacjami
+- Obsługa wag krawędzi
+- Transpozycja grafu
 
-### Zadanie 2: Algorytm Kosaraju
+### Generatory
 
-Implementacja algorytmu Kosaraju do znajdowania silnie spójnych składowych w grafie skierowanym. Algorytm wykorzystuje dwa przeszukiwania w głąb (DFS).
+- Losowy digraf G(n, p)
+- Losowy silnie spójny digraf z wagami
+- Automatyczne usuwanie cykli o ujemnej sumie wag
 
-### Zadanie 3: Generowanie silnie spójnego digrafu i algorytm Bellmana-Forda
+### Wizualizacja
 
-Generowanie losowego silnie spójnego digrafu z losowymi wagami krawędzi z zakresu [-5, 10] oraz implementacja algorytmu Bellmana-Forda do znajdowania najkrótszych ścieżek od danego wierzchołka. Algorytm potrafi obsługiwać krawędzie o ujemnych wagach.
+- Rysowanie digrafów z strzałkami
+- Kolorowanie silnie spójnych składowych
+- Wyświetlanie wag krawędzi
+- Obsługa krawędzi dwukierunkowych (łuki)
 
-### Zadanie 4: Algorytm Johnsona
+### Algorytmy
 
-Implementacja algorytmu Johnsona do znajdowania najkrótszych ścieżek między wszystkimi parami wierzchołków w grafie skierowanym. Algorytm może obsługiwać krawędzie o ujemnych wagach, o ile w grafie nie ma cyklu o ujemnej sumie wag.
+- **Kosaraju**: O(V + E) - silnie spójne składowe
+- **Bellman-Ford**: O(VE) - najkrótsze ścieżki z wykrywaniem ujemnych cykli
+- **Johnson**: O(V²logV + VE) - wszystkie pary najkrótszych ścieżek
 
-## Przykład użycia
+## Uwagi techniczne
 
-```python
-from lab04.digraph_representation import DiGraph
-from lab04.bellman_ford import bellman_ford, get_path
+### Parametry do prezentacji
 
-# Tworzenie grafu
-digraph = DiGraph(4)
-digraph.add_edge(0, 1, 3)   # Krawędź 0->1 o wadze 3
-digraph.add_edge(0, 2, -2)  # Krawędź 0->2 o wadze -2
-digraph.add_edge(1, 3, 5)   # Krawędź 1->3 o wadze 5
-digraph.add_edge(2, 1, 4)   # Krawędź 2->1 o wadze 4
-digraph.add_edge(2, 3, 1)   # Krawędź 2->3 o wadze 1
+Wszystkie zadania używają ustawionych na stałe parametrów optymalnych do prezentacji:
 
-# Uruchomienie algorytmu Bellmana-Forda od wierzchołka 0
-ds, ps, has_negative_cycle = bellman_ford(digraph, 0)
+- Liczba wierzchołków: 7
+- Prawdopodobieństwo krawędzi: 0.4-0.5
+- Wagi krawędzi: od -5 do 10
+- Wierzchołek źródłowy: 0
 
-if not has_negative_cycle:
-    # Wypisanie najkrótszych ścieżek
-    for v in range(digraph.V):
-        path = get_path(ps, 0, v)
-        if path:
-            path_str = " -> ".join(str(node) for node in path)
-            print(f"Najkrótsza ścieżka od 0 do {v}: [{path_str}], odległość = {ds[v]}")
-        else:
-            print(f"Brak ścieżki od 0 do {v}")
-else:
-    print("Wykryto cykl o ujemnej sumie wag!")
-```
+### Obsługa ujemnych cykli
+
+Algorytmy automatycznie wykrywają i eliminują cykle o ujemnej sumie wag:
+
+- Bellman-Ford zgłasza obecność takich cykli
+- Johnson kończy działanie jeśli wykryje ujemny cykl
+- Generator silnie spójnych digrafów modyfikuje wagi, aby uniknąć ujemnych cykli

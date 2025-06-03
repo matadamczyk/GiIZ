@@ -1,9 +1,9 @@
 """
-Generator losowych digrafów (skierowanych grafów) z zespołu G(n, p).
+Moduł do generowania losowych digrafów z różnymi właściwościami.
 """
 
 import random
-from lab04.digraph_representation import DiGraph
+from digraph_representation import DiGraph
 
 def generate_random_digraph(n, p):
     """
@@ -65,30 +65,52 @@ def generate_random_weighted_digraph(n, p, min_weight=-5, max_weight=10):
     assign_random_weights(digraph, min_weight, max_weight)
     return digraph
 
-def generate_random_strongly_connected_digraph(n, p, max_attempts=100):
+def generate_random_strongly_connected_digraph(n, p, min_weight=-5, max_weight=10):
     """
-    Generuje losowy silnie spójny digraf.
-    Próbuje wygenerować digraf tak długo, aż będzie silnie spójny.
+    Generuje losowy silnie spójny digraf z zespołu G(n, p) z wagami na krawędziach.
     
     Args:
         n: Liczba wierzchołków
         p: Prawdopodobieństwo istnienia krawędzi
-        max_attempts: Maksymalna liczba prób wygenerowania
+        min_weight: Minimalna waga krawędzi (domyślnie -5)
+        max_weight: Maksymalna waga krawędzi (domyślnie 10)
         
     Returns:
-        DiGraph: Wygenerowany losowy silnie spójny digraf lub None, jeśli nie udało się po max_attempts próbach
+        DiGraph: Silnie spójny digraf z wagami
     """
-    from lab04.kosaraju import kosaraju
+    if n <= 0:
+        raise ValueError("Liczba wierzchołków musi być dodatnia")
     
-    for _ in range(max_attempts):
+    if n == 1:
+        digraph = DiGraph(n)
+        digraph.add_edge(0, 0, random.randint(min_weight, max_weight))
+        return digraph
+    
+    max_attempts = 1000
+    
+    for attempt in range(max_attempts):
         digraph = generate_random_digraph(n, p)
+        
+        for i, j in digraph.get_edges():
+            weight = random.randint(min_weight, max_weight)
+            digraph.set_edge_weight(i, j, weight)
+        
+        from kosaraju import kosaraju
         components = kosaraju(digraph)
         
-        # Jeśli digraf ma tylko jedną silnie spójną składową, jest silnie spójny
         if len(components) == 1:
             return digraph
+            
+        force_connectivity_with_weights(digraph, components, min_weight, max_weight)
+        
+        components_after = kosaraju(digraph)
+        if len(components_after) == 1:
+            return digraph
     
-    return None
+    digraph = create_strongly_connected_digraph_with_weights(n, min_weight, max_weight)
+    add_random_edges_with_weights(digraph, p, min_weight, max_weight)
+    
+    return digraph
 
 def generate_random_weighted_strongly_connected_digraph(n, p, min_weight=-5, max_weight=10, max_attempts=100):
     """
@@ -104,7 +126,7 @@ def generate_random_weighted_strongly_connected_digraph(n, p, min_weight=-5, max
     Returns:
         DiGraph: Wygenerowany losowy silnie spójny ważony digraf lub None, jeśli nie udało się
     """
-    digraph = generate_random_strongly_connected_digraph(n, p, max_attempts)
+    digraph = generate_random_strongly_connected_digraph(n, p, min_weight, max_weight)
     
     if digraph:
         assign_random_weights(digraph, min_weight, max_weight)
@@ -129,7 +151,7 @@ def ensure_no_negative_cycles(digraph, min_weight=-4, max_weight=10):
     Returns:
         DiGraph: Zmodyfikowany digraf bez ujemnych cykli
     """
-    from lab04.bellman_ford import has_negative_cycle, find_negative_cycle
+    from bellman_ford import has_negative_cycle, find_negative_cycle
     
     # Dopóki graf ma ujemne cykle
     while has_negative_cycle(digraph):
@@ -151,4 +173,90 @@ def ensure_no_negative_cycles(digraph, min_weight=-4, max_weight=10):
                 
             digraph.weights[(u, v)] = new_weight
     
-    return digraph 
+    return digraph
+
+def check_for_negative_cycles_with_weights(digraph, min_weight, max_weight):
+    """
+    Sprawdza czy digraf ma cykl o ujemnej sumie wag i eliminuje takie cykle.
+    
+    Args:
+        digraph: Digraf do sprawdzenia
+        min_weight: Minimalna waga krawędzi
+        max_weight: Maksymalna waga krawędzi
+    """
+    from bellman_ford import has_negative_cycle, find_negative_cycle
+    
+    while has_negative_cycle(digraph):
+        cycle = find_negative_cycle(digraph)
+        if not cycle:
+            break
+            
+        for i in range(len(cycle) - 1):
+            u, v = cycle[i], cycle[i + 1]
+            new_weight = random.randint(1, max_weight)
+            digraph.set_edge_weight(u, v, new_weight)
+
+def force_connectivity_with_weights(digraph, components, min_weight, max_weight):
+    """
+    Wymusza silną spójność digrafu przez dodanie krawędzi między składowymi.
+    
+    Args:
+        digraph: Digraf do modyfikacji
+        components: Lista silnie spójnych składowych
+        min_weight: Minimalna waga krawędzi
+        max_weight: Maksymalna waga krawędzi
+    """
+    if len(components) <= 1:
+        return
+    
+    for i in range(len(components) - 1):
+        u = random.choice(components[i])
+        v = random.choice(components[i + 1])
+        weight = random.randint(min_weight, max_weight)
+        digraph.add_edge(u, v, weight)
+    
+    last_component = components[-1]
+    first_component = components[0]
+    u = random.choice(last_component)
+    v = random.choice(first_component)
+    weight = random.randint(min_weight, max_weight)
+    digraph.add_edge(u, v, weight)
+
+def create_strongly_connected_digraph_with_weights(n, min_weight, max_weight):
+    """
+    Tworzy deterministycznie silnie spójny digraf z wagami.
+    
+    Args:
+        n: Liczba wierzchołków
+        min_weight: Minimalna waga krawędzi
+        max_weight: Maksymalna waga krawędzi
+        
+    Returns:
+        DiGraph: Silnie spójny digraf
+    """
+    digraph = DiGraph(n)
+    
+    for i in range(n):
+        next_vertex = (i + 1) % n
+        weight = random.randint(min_weight, max_weight)
+        digraph.add_edge(i, next_vertex, weight)
+    
+    return digraph
+
+def add_random_edges_with_weights(digraph, p, min_weight, max_weight):
+    """
+    Dodaje losowe krawędzie z wagami do digrafu.
+    
+    Args:
+        digraph: Digraf do modyfikacji
+        p: Prawdopodobieństwo dodania krawędzi
+        min_weight: Minimalna waga krawędzi
+        max_weight: Maksymalna waga krawędzi
+    """
+    n = digraph.V
+    
+    for u in range(n):
+        for v in range(n):
+            if not digraph.has_edge(u, v) and random.random() < p:
+                weight = random.randint(min_weight, max_weight)
+                digraph.add_edge(u, v, weight) 
